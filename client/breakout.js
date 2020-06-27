@@ -1,6 +1,6 @@
 // import Phaser from "phaser";
 
-let player, ball, blueBrick, greenBrick, redBrick, yellowBrick, cursors
+let player, ball, blueBrick, greenBrick, redBrick, orangeBrick, cursors
 let gameStart = false;
 
 const config = {
@@ -34,7 +34,7 @@ function preload() {
   this.load.image('brick1', './public/assets/images/brick-blue.png')
   this.load.image('brick2', './public/assets/images/brick-green.png')
   this.load.image('brick3', './public/assets/images/brick-red.png')
-  this.load.image('brick4', './public/assets/images/brick-yellow.png')
+  this.load.image('brick4', './public/assets/images/brick-orange.png')
   this.load.image('paddle', './public/assets/images/paddle.png')
 }
 
@@ -73,8 +73,8 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
   greenBricks = this.physics.add.group({
@@ -87,8 +87,8 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
   redBricks = this.physics.add.group({
@@ -101,11 +101,11 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
-  yellowBricks = this.physics.add.group({
+  orangeBricks = this.physics.add.group({
     key: 'brick4',
     repeat: 8,
     immovable: true,
@@ -115,8 +115,8 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
 
@@ -127,7 +127,7 @@ function create() {
   this.physics.add.collider(ball, blueBricks, brickCollision, null, this)
   this.physics.add.collider(ball, greenBricks, brickCollision, null, this)
   this.physics.add.collider(ball, redBricks, brickCollision, null, this)
-  this.physics.add.collider(ball, yellowBricks, brickCollision, null, this)
+  this.physics.add.collider(ball, orangeBricks, brickCollision, null, this)
 
   //create collision between paddle and ball
   this.physics.add.collider(ball, player, playerCollision, null, this)
@@ -196,6 +196,6 @@ function gameOver(world){
 }
 
 function win(){
-  return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + yellowBricks.countActive() === 0
+  return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + orangeBricks.countActive() === 0
 }
 
