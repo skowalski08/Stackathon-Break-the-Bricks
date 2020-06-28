@@ -1,6 +1,6 @@
 // import Phaser from "phaser";
 
-let player, ball, blueBrick, greenBrick, redBrick, yellowBrick, cursors
+let player, ball, blueBrick, greenBrick, redBrick, orangeBrick, cursors
 let gameStart = false;
 
 const config = {
@@ -34,7 +34,7 @@ function preload() {
   this.load.image('brick1', './public/assets/images/brick-blue.png')
   this.load.image('brick2', './public/assets/images/brick-green.png')
   this.load.image('brick3', './public/assets/images/brick-red.png')
-  this.load.image('brick4', './public/assets/images/brick-yellow.png')
+  this.load.image('brick4', './public/assets/images/brick-orange.png')
   this.load.image('paddle', './public/assets/images/paddle.png')
 }
 
@@ -73,8 +73,8 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
   greenBricks = this.physics.add.group({
@@ -87,8 +87,8 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
   redBricks = this.physics.add.group({
@@ -101,11 +101,11 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
-  yellowBricks = this.physics.add.group({
+  orangeBricks = this.physics.add.group({
     key: 'brick4',
     repeat: 8,
     immovable: true,
@@ -115,22 +115,54 @@ function create() {
       stepX:70
     },
     setScale: {
-      x: .13,
-      y: .13
+      x: .3,
+      y: .3
     }
   })
 
   //add keyboard movement - up, down, left, right, shift, space
   cursors = this.input.keyboard.createCursorKeys()
 
+  //COLLISIONS
+
   //create collisions between brick and ball
   this.physics.add.collider(ball, blueBricks, brickCollision, null, this)
   this.physics.add.collider(ball, greenBricks, brickCollision, null, this)
   this.physics.add.collider(ball, redBricks, brickCollision, null, this)
-  this.physics.add.collider(ball, yellowBricks, brickCollision, null, this)
+  this.physics.add.collider(ball, orangeBricks, brickCollision, null, this)
 
   //create collision between paddle and ball
   this.physics.add.collider(ball, player, playerCollision, null, this)
+
+  //GAME STATUS WIN/LOSE
+  lostText = this.add.text(
+    this.physics.world.bounds.width / 2,
+    this.physics.world.bounds.height / 2,
+    'Try Again?',
+    {
+      fontFamily: 'Courier',
+      fontSize: '50px',
+      fill: '#fff'
+    }
+  )
+
+  lostText.setOrigin(0.5)
+  lostText.setVisible(false)
+
+  winText = this.add.text(
+    this.physics.world.bounds.width / 2,
+    this.physics.world.bounds.height / 2,
+    'You win!',
+    {
+      fontFamily: 'Courier',
+      fontSize: '50px',
+      fill: '#fff'
+    }
+  )
+
+  winText.setOrigin(0.5)
+  winText.setVisible(false)
+
 }
 
 function update(){
@@ -147,9 +179,12 @@ function update(){
   }
 
   if (gameOver(this.physics.world)) {
-    TODO: "you lose"
+    lostText.setVisible(true);
+    ball.disableBody(true, true)
+
   } else if (win()) {
-    TODO: "you win"
+    winText.setVisible(true)
+    ball.disableBody(true, true)
   } else {
     //while the game is live
     player.body.setVelocityX(0) //keeps player still if not pressing keyboard
@@ -161,9 +196,10 @@ function update(){
       player.body.setVelocityX(350) //num is px per second to the right
     }
   }
+
 }
 
-//collision functions
+// object collision functions
 function brickCollision(ball, brick) {
   brick.disableBody(true, true)
 
@@ -190,12 +226,12 @@ function playerCollision(ball, player) {
 }
 
 
-//Game Status
+//Game Status functions
 function gameOver(world){
-  return ball.body.y > world.bounds.height
+  return ball.body.y >= world.bounds.height - 40
 }
 
 function win(){
-  return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + yellowBricks.countActive() === 0
+  return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + orangeBricks.countActive() === 0
 }
 
