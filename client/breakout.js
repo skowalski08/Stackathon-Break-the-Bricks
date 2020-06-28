@@ -1,6 +1,7 @@
 // import Phaser from "phaser";
 
-let player, ball, blueBrick, greenBrick, redBrick, yellowBrick, cuursors
+let player, ball, blueBrick, greenBrick, redBrick, yellowBrick, cursors
+let gameStart = false;
 
 const config = {
   type: Phaser.AUTO,
@@ -27,6 +28,8 @@ const config = {
 const game = new Phaser.Game(config)
 
 function preload() {
+
+  // this.load.audio('rick', './public/assests/rick-rolled.oog')
   this.load.image('ball', './public/assets/images/ball.png')
   this.load.image('brick1', './public/assets/images/brick-blue.png')
   this.load.image('brick2', './public/assets/images/brick-green.png')
@@ -36,16 +39,27 @@ function preload() {
 }
 
 function create() {
+  //Rick roll 'em
+  //  this.rickRolled = this.sound.add('rick')
+  //   this.rickRolled.play()
+
+  //creating player via paddle
   player = this.physics.add.sprite(
     400, //x position
     600, //y position
     'paddle'
   ).setScale(.15),
+
+  //create ball
   ball = this.physics.add.sprite(
     400,
     565,
     'ball'
   ).setScale(.015)
+
+  ball.body.setBounce(1)
+
+  //add bricks
   blueBricks = this.physics.add.group({
     key: 'brick1',
     repeat: 8,
@@ -98,6 +112,9 @@ function create() {
       y: .13
     }
   })
+
+  //add keyboard movement - up, down, left, right, shift, space
+  cursors = this.input.keyboard.createCursorKeys()
 }
 
 function update(){
@@ -106,10 +123,30 @@ function update(){
   } else if (win()) {
     TODO: "you win"
   } else {
-    TODO: "something else?"
+    //while the game is live
+    player.body.setVelocityX(0) //keeps player still if not pressing keyboard
+
+    //controls the paddle left and right at px/s
+    if(cursors.left.isDown) {
+      player.body.setVelocityX(-350) //num is px per second to the left
+    } else if (cursors.right.isDown) {
+      player.body.setVelocityX(350) //num is px per second to the right
+    }
+
+    //GameStart on space
+    if (!gameStart) {
+      ball.setX(player.x)
+
+      if(cursors.space.isDown) {
+        gameStart = true
+        ball.setVelocityY(-250)
+      }
+    }
   }
 }
 
+
+//Game Status
 function gameOver(world){
   return ball.body.y > world.bounds.height
 }
@@ -117,3 +154,4 @@ function gameOver(world){
 function win(){
   return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + yellowBricks.countActive() === 0
 }
+
