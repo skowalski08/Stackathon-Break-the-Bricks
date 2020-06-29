@@ -1,13 +1,18 @@
 // import Phaser from "phaser";
+// import LoadingScene from './loadingScene'
 
 let player, ball, blueBrick, greenBrick, redBrick, orangeBrick, cursors
 let gameStart = false;
+let score = 0
+let scoreText;
+let rick;
 
 const config = {
   type: Phaser.AUTO,
   parent: 'game',
   width: 800,
-  height: 640,
+  height: 600,
+  debug: true,
   scale: {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -27,9 +32,11 @@ const config = {
 
 const game = new Phaser.Game(config)
 
+
 function preload() {
 
-  // this.load.audio('rick', './public/assests/rick-rolled.oog')
+  // this.load.audio('rick', ['./public/assests/rick-rolled.oog'])
+  this.load.image('background', './public/assets/images/background.png')
   this.load.image('ball', './public/assets/images/ball.png')
   this.load.image('brick1', './public/assets/images/brick-blue.png')
   this.load.image('brick2', './public/assets/images/brick-green.png')
@@ -39,9 +46,16 @@ function preload() {
 }
 
 function create() {
+
+  //background
+  this.add.sprite(0,0, 'background').setOrigin(0,0).setScale(1.40)
+
   //Rick roll 'em
-  //  this.rickRolled = this.sound.add('rick')
-  //   this.rickRolled.play()
+  // rick = this.sound.add('./public/assests/rick-rolled.oog')
+  // rick.play()
+
+  //setting up scoreboard
+  scoreText = this.add.text(5, 5, 'score: 0', { fontSize: '28px', fill: '#fff' });
 
   //creating player via paddle
   player = this.physics.add.sprite(
@@ -134,7 +148,21 @@ function create() {
   //create collision between paddle and ball
   this.physics.add.collider(ball, player, playerCollision, null, this)
 
-  //GAME STATUS WIN/LOSE
+  //GAME STATUS START/WIN/LOSE
+  startGameText = this.add.text(
+    this.physics.world.bounds.width / 2,
+    this.physics.world.bounds.height / 2,
+    'Press Spacebar to Start',
+    {
+      fontFamily: 'Courier',
+      fontSize: '50px',
+      fill: '#fff'
+    }
+  )
+
+  startGameText.setOrigin(0.5)
+  startGameText.setVisible(true)
+
   lostText = this.add.text(
     this.physics.world.bounds.width / 2,
     this.physics.world.bounds.height / 2,
@@ -174,13 +202,20 @@ function update(){
 
     if(cursors.space.isDown) {
       gameStart = true
+      startGameText.setVisible(false)
       ball.setVelocityY(-250)
+
     }
   }
 
   if (gameOver(this.physics.world)) {
     lostText.setVisible(true);
     ball.disableBody(true, true)
+    if(cursors.shift.isDown) {
+      gameStart = false
+      this.scene.restart()
+      score = 0
+    }
 
   } else if (win()) {
     winText.setVisible(true)
@@ -191,9 +226,9 @@ function update(){
 
     //controls the paddle left and right at px/s
     if(cursors.left.isDown) {
-      player.body.setVelocityX(-350) //num is px per second to the left
+      player.body.setVelocityX(-450) //num is px per second to the left
     } else if (cursors.right.isDown) {
-      player.body.setVelocityX(350) //num is px per second to the right
+      player.body.setVelocityX(450) //num is px per second to the right
     }
   }
 
@@ -202,6 +237,8 @@ function update(){
 // object collision functions
 function brickCollision(ball, brick) {
   brick.disableBody(true, true)
+  score += 10
+  scoreText.setText('score:' + score)
 
   if (ball.body.velocity.x === 0) {
     num = Math.random()
@@ -214,9 +251,9 @@ function brickCollision(ball, brick) {
 }
 
 function playerCollision(ball, player) {
-  ball.setVelocityY(ball.body.velocity.y - 20)
+  ball.setVelocityY(ball.body.velocity.y - 30)
 
-  let newVelX = Math.abs(ball.body.velocity.x) + 10;
+  let newVelX = Math.abs(ball.body.velocity.x) + 5;
 
   if (ball.x < player.x) {
     ball.setVelocityX(-newVelX)
@@ -235,3 +272,17 @@ function win(){
   return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + orangeBricks.countActive() === 0
 }
 
+// function gameRestart(){
+//   if(cursors.shift.isDown) {
+//     this.create.restart()
+//   }
+// }
+
+
+//to debug audio file?
+function render() {
+  game.debug.soundInfo(rick, 32, 32)
+  if (rick.isDecoding) {
+    game.debug.text('Decoding music...', 32, 200)
+  }
+}
