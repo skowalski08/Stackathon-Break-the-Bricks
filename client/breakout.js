@@ -35,7 +35,7 @@ const game = new Phaser.Game(config)
 
 function preload() {
 
-  // this.load.audio('rick', ['./public/assests/rick-rolled.oog'])
+  this.load.audio('rick', './public/assets/rick-rolled.ogg')
   this.load.image('background', './public/assets/images/background.png')
   this.load.image('ball', './public/assets/images/ball.png')
   this.load.image('brick1', './public/assets/images/brick-blue.png')
@@ -51,8 +51,9 @@ function create() {
   this.add.sprite(0,0, 'background').setOrigin(0,0).setScale(1.40)
 
   //Rick roll 'em
-  // rick = this.sound.add('./public/assests/rick-rolled.oog')
-  // rick.play()
+  this.rickRolled = this.sound.add('rick')
+  this.rickRolled.play()
+
 
   //setting up scoreboard
   scoreText = this.add.text(5, 5, 'score: 0', { fontSize: '28px', fill: '#fff' });
@@ -272,17 +273,3 @@ function win(){
   return blueBricks.countActive() + greenBricks.countActive() + redBricks.countActive() + orangeBricks.countActive() === 0
 }
 
-// function gameRestart(){
-//   if(cursors.shift.isDown) {
-//     this.create.restart()
-//   }
-// }
-
-
-//to debug audio file?
-function render() {
-  game.debug.soundInfo(rick, 32, 32)
-  if (rick.isDecoding) {
-    game.debug.text('Decoding music...', 32, 200)
-  }
-}
